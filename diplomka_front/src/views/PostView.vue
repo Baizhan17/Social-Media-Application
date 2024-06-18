@@ -39,7 +39,7 @@
 
 <script>
 import axios from 'axios'
-import PeopleYouMayKnow from '../components/PeopleYouMayKnow.vue'
+//import PeopleYouMayKnow from '../components/PeopleYouMayKnow.vue'
 import Trends from '../components/Trends.vue'
 import FeedItem from '../components/FeedItem.vue'
 import CommentItem from '../components/CommentItem.vue'
@@ -48,7 +48,7 @@ export default {
     name: 'PostView',
 
     components: {
-        PeopleYouMayKnow,
+     
         Trends,
         FeedItem,
         CommentItem

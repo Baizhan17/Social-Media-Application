@@ -6,7 +6,7 @@ from rest_framework.decorators import api_view,authentication_classes,permission
 from rest_framework import viewsets
 from rest_framework.pagination import PageNumberPagination
 from .forms import PostForm,AttachmentForm
-from account.models import User
+from account.models import User,FriendRequest
 from account.serializers import UserSerializer
 from django.core.paginator import Paginator
 
@@ -34,9 +34,15 @@ def post_list(request):
 def post_list_profile(request,id):
     user=User.objects.get(pk=id)
     posts=Post.objects.filter(created_by_id=id)
+    send_f_request=True
     posts_serializer = PostSerializer(posts,many=True)
     user_serializer = UserSerializer(user)
-    return JsonResponse({'posts':posts_serializer.data,'user':user_serializer.data},safe=False)
+    h1=FriendRequest.objects.filter(created_by=request.user, request_for=user).exists()
+    h2=FriendRequest.objects.filter(created_by=user, request_for=request.user).exists()
+    if h1 or h2:
+        send_f_request=False
+   
+    return JsonResponse({'posts':posts_serializer.data,'user':user_serializer.data,'send_f_request':send_f_request},safe=False)
 
 
 @api_view(['POST'])
@@ -57,7 +63,7 @@ def add_post(request):
         user=request.user
         user.posts_number+=1
         user.save()
-        serializer = PostSerializer(posts)
+        serializer = PostSerializer(post)
         return JsonResponse(serializer.data,safe=False)
     else:
         return JsonResponse({'error':'gtr'})

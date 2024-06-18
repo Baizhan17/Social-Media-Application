@@ -8,6 +8,7 @@ urlpatterns = [
     path('login/', TokenObtainPairView.as_view(), name='token_obtain'),
     path('refresh/', TokenRefreshView.as_view(), name='token_refresh'),
     path('friends/<uuid:pk>/', api.friends, name='friends'),
+    path('friends/reccomended/',api.friends_reccomendations,name='friends_reccomendations'),
     path('editprofile/',api.reset_account,name='reset_account'),
     path('editpassword/',api.reset_password,name='reset_password'),
     path('friends/<uuid:pk>/request/', api.send_friend_request, name='send_friend_request'),

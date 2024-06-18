@@ -46,7 +46,7 @@
         </div>
 
         <div class="main-right col-span-1 space-y-4">
-            <!-- <PeopleYouMayKnow /> -->
+            <FriendsReccomendation />
 
             <Trends />
         </div>
@@ -55,7 +55,7 @@
 
 <script>
 import axios from 'axios'
-import PeopleYouMayKnow from '../components/PeopleYouMayKnow.vue'
+import FriendsReccomendation from '../components/FriendsReccomendation.vue'
 import Trends from '../components/Trends.vue'
 import FeedItem from '../components/FeedItem.vue'
 
@@ -63,7 +63,7 @@ export default {
     name: 'SearchView',
 
     components: {
-        PeopleYouMayKnow,
+        FriendsReccomendation,
         Trends,
         FeedItem,
     },

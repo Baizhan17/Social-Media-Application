@@ -15,7 +15,7 @@
                     <button 
                         class="inline-block py-4 px-3 bg-blue-600 text-xs text-white rounded-lg" 
                         @click="sendFriendshipRequest"
-                        v-if="userStore.user.id !== user.id"
+                        v-if="userStore.user.id !== user.id && send_f_request"
                     >
                         Send friendship request
                     </button>
@@ -80,7 +80,7 @@
 
 <script>
 import axios from 'axios'
-import PeopleYouMayKnow from '../components/PeopleYouMayKnow.vue'
+//import PeopleYouMayKnow from '../components/PeopleYouMayKnow.vue'
 import Trends from '../components/Trends.vue'
 import FeedItem from '../components/FeedItem.vue'
 import { useUserStore } from '@/stores/user'
@@ -100,7 +100,7 @@ export default {
     },
 
     components: {
-        PeopleYouMayKnow,
+
         Trends,
         FeedItem
     },
@@ -111,6 +111,7 @@ export default {
             user: {
                 id: null
             },
+            send_f_request:null,
             body: '',
             url:null
         }
@@ -145,21 +146,23 @@ export default {
 
         },
         sendFriendshipRequest() {
-            axios
-                .post(`/api/friends/${this.$route.params.id}/request/`)
-                .then(response => {
-                    console.log('data', response.data)
-
-                    if (response.data.message == 'request already sent') {
-                        this.toastStore.showToast(5000, 'The request has already been sent!', 'bg-red-300')
-                    } else {
-                        this.toastStore.showToast(5000, 'The request was sent!', 'bg-emerald-300')
-                    }
-                })
-                .catch(error => {
-                    console.log('error', error)
-                })
-        },
+        axios
+            .post(`/api/friends/${this.$route.params.id}/request/`)
+            .then(response => {
+                console.log('data', response.data);
+                this.send_f_request=false
+                if (response.data.message == 'Friend request already sent') {
+                    this.toastStore.showToast(5000, 'The request has already been sent!', 'bg-red-300');
+                    window.alert('The friendship request has already been sent!');
+                } else {
+                    this.toastStore.showToast(5000, 'The request was sent!', 'bg-emerald-300');
+                    window.alert('The friendship request was successfully sent!');
+                }
+            })
+            .catch(error => {
+                console.log('error', error);
+            });
+    },
 
         getFeed() {
             axios
@@ -169,30 +172,36 @@ export default {
 
                     this.posts = response.data.posts
                     this.user = response.data.user
+                    this.send_f_request=response.data.send_f_request
                 })
                 .catch(error => {
                     console.log('error', error)
                 })
         },
 
-        submitForm() {
-            console.log('submitForm', this.body)
-            // let formData =new FormData()
-            // formData.append('body', this.body)
-            // formData.append('image', this.$refs.file.feiles[0])
-            axios
-                .post('/api/posts/create/',formData)
-                .then(response => {
-                    console.log('data', response.data)
+       submitForm() {
+    console.log('submitForm', this.body);
+    let formData = new FormData(); // Create a new FormData instance
+    formData.append('body', this.body);
 
-                    this.posts.unshift(response.data)
-                    this.body = ''
-                    this.user.posts_number+=1
-                })
-                .catch(error => {
-                    console.log('error', error)
-                })
-        },
+    if (this.$refs.file.files[0]) { // Check if a file is selected
+        formData.append('image', this.$refs.file.files[0]);
+    }
+
+    axios
+        .post('/api/posts/create/', formData)
+        .then(response => {
+            console.log('data', response.data);
+
+            this.posts.unshift(response.data);
+            this.body = '';
+            this.user.posts_number += 1;
+        })
+        .catch(error => {
+            console.log('error', error);
+        });
+}
+,
 
         logout() {
             console.log('Log out')

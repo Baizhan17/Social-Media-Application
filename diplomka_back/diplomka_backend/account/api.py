@@ -118,6 +118,18 @@ def reset_account(request):
         return JsonResponse({'message': 'new email is setted up'})
     
 
+@api_view(['GET'])
+def friends_reccomendations(request):
+    serializer=UserSerializer(request.user.friends_suggestion.all(),many=True)
+    return JsonResponse(serializer.data,safe=False)
+
+
+
+
+
+
+
+
 @api_view(['POST'])
 def reset_password(request):
     user = request.user

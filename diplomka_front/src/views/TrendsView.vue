@@ -28,12 +28,12 @@
 
 <script>
 import axios from "axios"
-import PeopleYouMayKnow from '@/components/PeopleYouMayKnow.vue';
+//import PeopleYouMayKnow from '@/components/PeopleYouMayKnow.vue';
 import Trends from '@/components/Trends.vue';
 export  default {
     name: "FeedView",
     components:{
-        PeopleYouMayKnow,Trends,
+  Trends,
     },
     data(){
         return{
