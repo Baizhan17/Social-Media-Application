@@ -50,12 +50,16 @@
             >
                 <form v-on:submit.prevent="submitForm" method="post">
                     <div class="p-4">  
-                        <textarea v-model="body" class="p-4 w-full bg-gray-100 rounded-lg" placeholder="What are you thinking about?"></textarea>
+                        <textarea 
+                            v-model="body" 
+                            class="p-4 w-full bg-gray-100 rounded-lg resize-none overflow-hidden" 
+                            placeholder="What are you thinking about?" 
+                            @input="autoResize"
+                        ></textarea>
                     </div>
 
                     <div class="p-4 border-t border-gray-100 flex justify-between">
-                        <a href="#" class="inline-block py-4 px-6 bg-gray-600 text-white rounded-lg">Add image</a>
-                        <input type="file" ref="file" class=""/>
+                        <input type="file" ref="file" class="inline-block py-4 px-6 bg-gray-600 text-white rounded-lg"/>
                         <button class="inline-block py-4 px-6 bg-blue-600 text-white rounded-lg">Post</button>
                     </div>
                 </form>
@@ -100,7 +104,6 @@ export default {
     },
 
     components: {
-
         Trends,
         FeedItem
     },
@@ -111,9 +114,9 @@ export default {
             user: {
                 id: null
             },
-            send_f_request:null,
+            send_f_request: null,
             body: '',
-            url:null
+            url: null
         }
     },
 
@@ -132,7 +135,7 @@ export default {
     },
 
     methods: {
-        sendMessage(){
+        sendMessage() {
             console.log(`the message:  is sent to `)
             axios
                 .get(`/api/user_chat/${this.$route.params.id}/get-create/`)
@@ -143,73 +146,81 @@ export default {
                 .catch(error => {
                     console.log('error while sending the message', error)
                 })
-
         },
+
         sendFriendshipRequest() {
-        axios
-            .post(`/api/friends/${this.$route.params.id}/request/`)
-            .then(response => {
-                console.log('data', response.data);
-                this.send_f_request=false
-                if (response.data.message == 'Friend request already sent') {
-                    this.toastStore.showToast(5000, 'The request has already been sent!', 'bg-red-300');
-                    window.alert('The friendship request has already been sent!');
-                } else {
-                    this.toastStore.showToast(5000, 'The request was sent!', 'bg-emerald-300');
-                    window.alert('The friendship request was successfully sent!');
-                }
-            })
-            .catch(error => {
-                console.log('error', error);
-            });
-    },
+            axios
+                .post(`/api/friends/${this.$route.params.id}/request/`)
+                .then(response => {
+                    console.log('data', response.data);
+                    this.send_f_request = false
+                    if (response.data.message == 'Friend request already sent') {
+                        this.toastStore.showToast(5000, 'The request has already been sent!', 'bg-red-300');
+                        window.alert('The friendship request has already been sent!');
+                    } else {
+                        this.toastStore.showToast(5000, 'The request was sent!', 'bg-emerald-300');
+                        window.alert('The friendship request was successfully sent!');
+                    }
+                })
+                .catch(error => {
+                    console.log('error', error);
+                });
+        },
 
         getFeed() {
             axios
                 .get(`/api/posts/profile/${this.$route.params.id}/`)
                 .then(response => {
                     console.log('data', response.data)
-
                     this.posts = response.data.posts
                     this.user = response.data.user
-                    this.send_f_request=response.data.send_f_request
+                    this.send_f_request = response.data.send_f_request
                 })
                 .catch(error => {
                     console.log('error', error)
                 })
         },
 
-       submitForm() {
-    console.log('submitForm', this.body);
-    let formData = new FormData(); // Create a new FormData instance
-    formData.append('body', this.body);
+        submitForm() {
+            console.log('submitForm', this.body);
+            let formData = new FormData(); // Create a new FormData instance
+            formData.append('body', this.body);
 
-    if (this.$refs.file.files[0]) { // Check if a file is selected
-        formData.append('image', this.$refs.file.files[0]);
-    }
+            if (this.$refs.file.files[0]) { // Check if a file is selected
+                formData.append('image', this.$refs.file.files[0]);
+            }
 
-    axios
-        .post('/api/posts/create/', formData)
-        .then(response => {
-            console.log('data', response.data);
+            axios
+                .post('/api/posts/create/', formData)
+                .then(response => {
+                    console.log('data', response.data);
 
-            this.posts.unshift(response.data);
-            this.body = '';
-            this.user.posts_number += 1;
-        })
-        .catch(error => {
-            console.log('error', error);
-        });
-}
-,
+                    this.posts.unshift(response.data);
+                    this.body = '';
+                    this.user.posts_number += 1;
+                })
+                .catch(error => {
+                    console.log('error', error);
+                });
+        },
+
+        autoResize(event) {
+            const textarea = event.target;
+            textarea.style.height = 'auto';
+            textarea.style.height = textarea.scrollHeight + 'px';
+        },
 
         logout() {
             console.log('Log out')
-
             this.userStore.removeToken()
-
             this.$router.push('/')
         }
     }
 }
 </script>
+
+<style scoped>
+textarea {
+    resize: none; /* Disable manual resizing */
+}
+</style>

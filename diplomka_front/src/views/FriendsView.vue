@@ -7,7 +7,7 @@
                 <p><strong>{{ user.name }}</strong></p>
 
                 <div class="mt-6 flex space-x-8 justify-around">
-                    <p class="text-xs text-gray-500">{{ user.friends_count }} friends</p>
+                    <p class="text-xs text-gray-500">{{ user.friends_number }} friends</p>
                     <p class="text-xs text-gray-500">{{user.posts_number}} posts</p>
                 </div>
             </div>
@@ -34,7 +34,7 @@
                     </p>
 
                     <div class="mt-6 flex space-x-8 justify-around">
-                        <p class="text-xs text-gray-500">{{ user.friends_count }} friends</p>
+                        <p class="text-xs text-gray-500">{{ user.friends_number }} friends</p>
                         <p class="text-xs text-gray-500">{{user.posts_number}} posts</p>
                     </div>
 
@@ -82,7 +82,7 @@
 
 <script>
 import axios from 'axios'
-//import PeopleYouMayKnow from '../components/PeopleYouMayKnow.vue'
+
 import Trends from '../components/Trends.vue'
 import FeedItem from '../components/FeedItem.vue'
 import { useUserStore } from '@/stores/user'

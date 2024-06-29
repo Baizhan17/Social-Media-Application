@@ -1,73 +1,70 @@
-
 from django.http import JsonResponse
-from .serializers import PostSerializer,PostDetailSerializer,CommentSerializer,TrendSerializer
-from .models import Post,Like,Comment,Trend
-from rest_framework.decorators import api_view,authentication_classes,permission_classes
+from .serializers import PostSerializer, PostDetailSerializer, CommentSerializer, TrendSerializer
+from .models import Post, Like, Comment, Trend, PostAttachment
+from rest_framework.decorators import api_view, authentication_classes, permission_classes
 from rest_framework import viewsets
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from rest_framework.pagination import PageNumberPagination
-from .forms import PostForm,AttachmentForm
-from account.models import User,FriendRequest
+from .forms import PostForm, AttachmentForm
+from account.models import User, FriendRequest
 from account.serializers import UserSerializer
-from django.core.paginator import Paginator
 
-# class PostPagination(PageNumberPagination):
-#     page_size=5
+class PostPagination(PageNumberPagination):
+    page_size = 10  # Number of posts per page
 
-# class PostViewSet(viewsets.ModelViewSet):
-#     pagination_class = PostPagination
-#     serializer_class = PostSerializer
-#     queryset = Post.objects.all()
 @api_view(['GET'])
 def post_list(request):
-    usr_id_list=[request.user.id]
-    for user in request.user.friends.all():
-        usr_id_list.append(user.id)
-    posts=Post.objects.filter(created_by_id__in=list(usr_id_list))
-    #trend=request.GET.get('trend','')
+    usr_id_list = [request.user.id] + [user.id for user in request.user.friends.all()]
+    posts = Post.objects.filter(created_by_id__in=usr_id_list)
+
+    paginator = PostPagination()
+    paginated_posts = paginator.paginate_queryset(posts, request)
+    serializer = PostSerializer(paginated_posts, many=True)
     
-    serializer = PostSerializer(posts,many=True)
-    return JsonResponse({'data':serializer.data})
-
-
+    return paginator.get_paginated_response(serializer.data)
 
 @api_view(['GET'])
-def post_list_profile(request,id):
-    user=User.objects.get(pk=id)
-    posts=Post.objects.filter(created_by_id=id)
-    send_f_request=True
-    posts_serializer = PostSerializer(posts,many=True)
+def post_list_profile(request, id):
+    user = User.objects.get(pk=id)
+    posts = Post.objects.filter(created_by_id=id)
+    send_f_request = True
+    posts_serializer = PostSerializer(posts, many=True)
     user_serializer = UserSerializer(user)
-    h1=FriendRequest.objects.filter(created_by=request.user, request_for=user).exists()
-    h2=FriendRequest.objects.filter(created_by=user, request_for=request.user).exists()
+    h1 = FriendRequest.objects.filter(created_by=request.user, request_for=user).exists()
+    h2 = FriendRequest.objects.filter(created_by=user, request_for=request.user).exists()
     if h1 or h2:
-        send_f_request=False
-   
-    return JsonResponse({'posts':posts_serializer.data,'user':user_serializer.data,'send_f_request':send_f_request},safe=False)
+        send_f_request = False
 
+    return JsonResponse({'posts': posts_serializer.data, 'user': user_serializer.data, 'send_f_request': send_f_request}, safe=False)
 
 @api_view(['POST'])
 def add_post(request):
-    form=PostForm(request.POST)
-    attachment=None
-    attachment_form=AttachmentForm(request.FILES)
-    if attachment_form.is_valid():
-        attachment=attachment_form.save(commit=False)
-        attachment.created_by=request.user
-        attachment.save()
-    if form.is_valid():
-        post=form.save(commit=False)
-        post.created_by=request.user
+    post_form = PostForm(request.POST)
+    attachment_form = AttachmentForm(request.FILES)
+
+    if post_form.is_valid():
+        post = post_form.save(commit=False)
+        post.created_by = request.user
         post.save()
-        if attachment:
+        
+        if attachment_form.is_valid():
+            attachment = attachment_form.save(commit=False)
+            attachment.created_by = request.user
+            attachment.save()
             post.attachments.add(attachment)
-        user=request.user
-        user.posts_number+=1
-        user.save()
+
+        post.save()
+        
+        # Update user's post count
+        request.user.posts_number += 1
+        request.user.save()
+
         serializer = PostSerializer(post)
-        return JsonResponse(serializer.data,safe=False)
+        return JsonResponse(serializer.data, safe=False)
     else:
-        return JsonResponse({'error':'gtr'})
-    
+        errors = {**post_form.errors, **attachment_form.errors}
+        return JsonResponse({'errors': errors}, status=400)
+
 @api_view(['POST'])
 def like_post(request, pk):
     try:
@@ -81,20 +78,14 @@ def like_post(request, pk):
         post.likes_counter += 1
         post.likes.add(like)
         post.save()
-        return JsonResponse({'message': f'The post  has been liked'}, status=200)
-    
-    return JsonResponse({'message': f'Post with id {post.id} has already been liked'}, status=400)
+        return JsonResponse({'message': 'The post has been liked'}, status=200)
 
+    return JsonResponse({'message': 'Post has already been liked'}, status=400)
 
 @api_view(['GET'])
 def post_comments(request, pk):
     post = Post.objects.get(pk=pk)
-    
-    return JsonResponse({'post':PostDetailSerializer(post).data})
-
-
-
-
+    return JsonResponse({'post': PostDetailSerializer(post).data})
 
 @api_view(['POST'])
 def add_comment(request, pk):
@@ -111,9 +102,8 @@ def add_comment(request, pk):
         return JsonResponse(serializer.data, safe=False)
     else:
         return JsonResponse({'message': 'Comment text is required'}, status=400)
-    
+
 @api_view(['GET'])
 def get_trends(request):
-    
-    serializer = TrendSerializer(Trend.objects.all(),many=True)
+    serializer = TrendSerializer(Trend.objects.all(), many=True)
     return JsonResponse(serializer.data, safe=False)

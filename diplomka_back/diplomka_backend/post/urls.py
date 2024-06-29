@@ -1,6 +1,8 @@
 from django.urls import path,include
 from . import api
 from rest_framework.routers import DefaultRouter
+from django.conf import settings
+from django.conf.urls.static import static
 # router = DefaultRouter()
 # router.register("posts", api.PostViewSet, basename="posts")
 
@@ -15,3 +17,6 @@ urlpatterns = [
     path('<uuid:pk>/',api.post_comments,name='post_comments'),
     path('<uuid:id>/',api.post_list_profile,name='post_list_profile'),
 ]
+
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

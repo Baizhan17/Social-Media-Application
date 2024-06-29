@@ -7,8 +7,8 @@ from django.utils.timesince import timesince
 
 class PostAttachment(models.Model):
     id=models.UUIDField(primary_key=True,default=uuid.uuid4,editable=False)
-    image=models.ImageField(upload_to="post_attachments")
-    created_by=models.ForeignKey(User,related_name="post_attachments",on_delete=models.CASCADE)
+    image=models.ImageField(upload_to="post_postattachment")
+    created_by=models.ForeignKey(User,related_name="post_postattachment",on_delete=models.CASCADE)
 class Like(models.Model):
     id=models.UUIDField(primary_key=True,default=uuid.uuid4,editable=False)
     created_by=models.ForeignKey(User,related_name="likes",on_delete=models.CASCADE)
@@ -40,6 +40,9 @@ class Post(models.Model):
     def created_at_format(self):
         return timesince(self.created_at)
     
+# class PostImage(models.Model):
+#     images=models.ImageField(upload_to='uploads')    
+
 class Trend(models.Model):
     hashtags = models.CharField(max_length=50)
     hashtags_counter=models.IntegerField()
