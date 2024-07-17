@@ -84,7 +84,7 @@ import axios from "axios";
 import Trends from '@/components/Trends.vue';
 
 export default {
-  name: "FeedView",
+  name: "MainView",
   components: {
     Trends,
   },

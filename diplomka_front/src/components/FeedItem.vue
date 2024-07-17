@@ -38,53 +38,85 @@
             </div>
         </div>
         
-        <div>
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+        <div class="relative">
+            <svg @click="toggleReportBox" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6 menu-b cursor-pointer">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.75a.75.75 0 110-1.5.75.75 0 010 1.5zM12 12.75a.75.75 0 110-1.5.75.75 0 010 1.5zM12 18.75a.75.75 0 110-1.5.75.75 0 010 1.5z"></path>
-            </svg>   
-        </div>   
+            </svg> 
+
+            <div v-if="showReportBox" class="absolute right-0 mt-2 w-32 bg-white border border-gray-300 rounded-md shadow-lg z-10">
+                <RouterLink :to="{ name: 'report' }" class="p-2 text-center text-rose-600 cursor-pointer hover:bg-gray-200">Report</RouterLink>
+            </div>
+        </div>  
     </div>  
 </template>
 
-
 <script>
 import axios from 'axios';
+import { RouterLink } from 'vue-router';
 
 export default {
+    components: {
+        RouterLink,
+    },
     props: {
-        post: Object
+        post: {
+            type: Object,
+            required: true
+        }
+    },
+
+    data() {
+        return {
+            showReportBox: false
+        };
     },
 
     computed: {
+        // Splits long words in the post body for better readability
         formattedBody() {
-            return this.post.body.split(' ').map(word => {
-                if (word.length > 60) {
-                    return word.match(/.{1,60}/g).join('<br>');
-                }
-                return word;
-            }).join(' ');
+            return this.post.body.split(' ').map(word => 
+                word.length > 60 ? word.match(/.{1,60}/g).join('<br>') : word
+            ).join(' ');
         }
     },
 
     methods: {
+        // Toggles the visibility of the report box
+        toggleReportBox() {
+            this.showReportBox = !this.showReportBox;
+        },
+
+        // Sends a request to like a post
         async likePost(id) {
             try {
                 const response = await axios.post(`/api/posts/${id}/like/`);
                 console.log('Response:', response.data); // Debugging
                 if (response.data.message === 'The post has been liked') {
-                    // Update likes_counter reactively
-                    this.post = { ...this.post, likes_counter: this.post.likes_counter + 1 };
+                    // Update likes_counter directly
+                    this.post.likes_counter += 1;
                 } else {
                     console.log('Unexpected response message:', response.data.message);
                 }
             } catch (error) {
-                console.error('Error liking the post:', error);
+                if (error.response) {
+                    // The request was made and the server responded with a status code
+                    // that falls out of the range of 2xx
+                    console.error('Error response data:', error.response.data);
+                    console.error('Error response status:', error.response.status);
+                    console.error('Error response headers:', error.response.headers);
+                } else if (error.request) {
+                    // The request was made but no response was received
+                    console.error('Error request data:', error.request);
+                } else {
+                    // Something happened in setting up the request that triggered an Error
+                    console.error('Error message:', error.message);
+                }
+                console.error('Error config:', error.config);
             }
-        }
+        },
     }
 }
 </script>
-
 
 <style>
 .attachment-image {

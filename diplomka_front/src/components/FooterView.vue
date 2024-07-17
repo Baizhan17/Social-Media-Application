@@ -9,19 +9,15 @@
             </div>
             <div class="px-5 py-2">
                 <a href="#" class="text-base leading-6 text-gray-500 hover:text-gray-900">
-                    Blog
+                    Community
                 </a>
             </div>
             <div class="px-5 py-2">
                 <a href="#" class="text-base leading-6 text-gray-500 hover:text-gray-900">
-                    Team
+                    Developers
                 </a>
             </div>
-            <div class="px-5 py-2">
-                <a href="#" class="text-base leading-6 text-gray-500 hover:text-gray-900">
-                    Pricing
-                </a>
-            </div>
+            
             <div class="px-5 py-2">
                 <a href="#" class="text-base leading-6 text-gray-500 hover:text-gray-900">
                     Contact

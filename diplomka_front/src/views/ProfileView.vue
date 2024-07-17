@@ -2,7 +2,7 @@
     <div class="max-w-7xl mx-auto grid grid-cols-4 gap-4">
         <div class="main-left col-span-1">
             <div class="p-4 bg-white border border-gray-200 text-center rounded-lg">
-                <img src="https://i.pravatar.cc/300?u=fake@pravatar.com" class="mb-6 rounded-full">
+                <img src="https://placebear.com/250/250" class="mb-6 rounded-full">
                 
                 <p><strong>{{ user.name }}</strong></p>
 
@@ -13,28 +13,28 @@
 
                 <div class="mt-6 flex flex-col">
                     <button 
-                        class="inline-block py-4 px-3 bg-blue-600 text-xs text-white rounded-lg" 
+                        class="inline-block py-4 px-3 bg-blue-600 text-xs text-white rounded-lg hover:bg-sky-700" 
                         @click="sendFriendshipRequest"
                         v-if="userStore.user.id !== user.id && send_f_request"
                     >
                         Send friendship request
                     </button>
                     <button 
-                        class="inline-block py-4 px-3 bg-blue-600 text-xs text-white rounded-lg mt-4" 
+                        class="inline-block py-4 px-3 bg-blue-600 text-xs text-white rounded-lg mt-4 hover:bg-sky-700" 
                         @click="sendMessage"
                         v-if="userStore.user.id !== user.id"
                     >
                         Send Message
                     </button>
                     <button 
-                        class="inline-block py-4 px-3 bg-red-600 text-xs text-white rounded-lg pb-4 mb-4" 
+                        class="inline-block py-4 px-3 bg-red-600 text-xs text-white rounded-lg pb-4 mb-4 hover:bg-red-700" 
                         @click="logout"
                         v-if="userStore.user.id === user.id"
                     >
                         Log out
                     </button>
                     <RouterLink :to="{ name: 'editprofile' }"
-                        class="inline-block py-4 px-3 bg-emerald-600 text-xs text-white rounded-lg" 
+                        class="inline-block py-4 px-3 bg-emerald-600 text-xs text-white rounded-lg hover:bg-emerald-700" 
                         v-if="userStore.user.id === user.id"
                     >
                         Edit profile
@@ -58,8 +58,9 @@
                         ></textarea>
                     </div>
 
-                    <div class="p-4 border-t border-gray-100 flex justify-between">
-                        <input type="file" ref="file" class="inline-block py-4 px-6 bg-gray-600 text-white rounded-lg"/>
+                    <div class="p-4 border-t border-gray-100 flex justify-between items-center">
+                        <input type="file" ref="file" class="hidden-file-input" />
+                        <button type="button" class="inline-block py-4 px-6 bg-gray-600 text-white rounded-lg" @click="triggerFileInput">Upload Image</button>
                         <button class="inline-block py-4 px-6 bg-blue-600 text-white rounded-lg">Post</button>
                     </div>
                 </form>
@@ -76,7 +77,6 @@
 
         <div class="main-right col-span-1 space-y-4">
             <!-- <PeopleYouMayKnow /> -->
-
             <!-- <Trends /> -->
         </div>
     </div>
@@ -89,7 +89,7 @@ import Trends from '../components/Trends.vue'
 import FeedItem from '../components/FeedItem.vue'
 import { useUserStore } from '@/stores/user'
 import { useToastStore } from '@/stores/toast'
-
+import EmojiPicker from 'vue-emoji-picker'
 export default {
     name: 'FeedView',
 
@@ -105,7 +105,8 @@ export default {
 
     components: {
         Trends,
-        FeedItem
+        FeedItem,
+        EmojiPicker
     },
 
     data() {
@@ -116,7 +117,9 @@ export default {
             },
             send_f_request: null,
             body: '',
-            url: null
+            url: null,
+            input: '',
+            search: '',
         }
     },
 
@@ -138,16 +141,18 @@ export default {
         sendMessage() {
             console.log(`the message:  is sent to `)
             axios
-                .get(`/api/user_chat/${this.$route.params.id}/get-create/`)
+                .get(`/api/userchat/${this.$route.params.id}/get-create/`)
                 .then(response => {
                     console.log(response.data)
-                    this.$router.push('/user_chat')
+                    this.$router.push('/userchat')
                 })
                 .catch(error => {
                     console.log('error while sending the message', error)
                 })
         },
-
+        insert(emoji) {
+            this.input += emoji
+        },
         sendFriendshipRequest() {
             axios
                 .post(`/api/friends/${this.$route.params.id}/request/`)
@@ -214,12 +219,21 @@ export default {
             console.log('Log out')
             this.userStore.removeToken()
             this.$router.push('/')
+        },
+
+        triggerFileInput() {
+            this.$refs.file.click()
         }
     }
 }
 </script>
 
 <style scoped>
+.hidden-file-input {
+    opacity: 0;
+    position: absolute;
+    z-index: -1;
+}
 textarea {
     resize: none; /* Disable manual resizing */
 }

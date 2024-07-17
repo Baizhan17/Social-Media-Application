@@ -2,7 +2,6 @@ from django.http import JsonResponse
 from post.serializers import PostSerializer
 from post.models import Post
 from rest_framework.decorators import api_view,authentication_classes,permission_classes
-# from .forms import PostForm
 from account.models import User
 from account.serializers import UserSerializer
 @api_view(['POST'])

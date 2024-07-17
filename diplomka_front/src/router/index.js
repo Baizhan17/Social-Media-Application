@@ -3,7 +3,7 @@ import { useUserStore } from '@/stores/user';
 import HomeView from '../views/HomeView.vue';
 import SignUpView from '@/views/SignUpView.vue';
 import LoginView from '@/views/LoginView.vue';
-import FeedView from '@/views/FeedView.vue';
+import MainView from '@/views/MainView.vue';
 import SearchView from '@/views/SearchView.vue';
 import ProfileView from '@/views/ProfileView.vue';
 import FriendsView from '@/views/FriendsView.vue';
@@ -13,6 +13,7 @@ import AboutView from '../views/AboutView.vue';
 import TrendsView from '../views/TrendsView.vue';
 import EditProfileView from '@/views/EditProfileView.vue';
 import EditPasswordView from '@/views/EditPasswordView.vue';
+import ReportView from '../views/ReportView.vue';
 const restrictedRoutesForAuthenticated = ['home', 'signup', 'login'];
 
 const routes = [
@@ -34,7 +35,7 @@ const routes = [
   {
     path: '/feed',
     name: 'feed',
-    component: FeedView
+    component: MainView
   },
   {
     path: '/search',
@@ -67,7 +68,7 @@ const routes = [
     component: PostView
   },
   {
-    path: '/user_chat',
+    path: '/userchat',
     name: 'userchat',
     component: UserChatView
   },
@@ -80,6 +81,11 @@ const routes = [
     path: '/trends/:id',
     name: 'trendsview',
     component: TrendsView
+  },
+  {
+    path: '/report',
+    name: 'report',
+    component: ReportView
   },
 ];
 

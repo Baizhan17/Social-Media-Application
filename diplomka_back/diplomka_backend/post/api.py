@@ -1,11 +1,11 @@
 from django.http import JsonResponse
-from .serializers import PostSerializer, PostDetailSerializer, CommentSerializer, TrendSerializer
+from .serializers import PostSerializer, PostDetailSerializer, CommentSerializer, TrendSerializer,PostReportSerializer
 from .models import Post, Like, Comment, Trend, PostAttachment
 from rest_framework.decorators import api_view, authentication_classes, permission_classes
 from rest_framework import viewsets
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from rest_framework.pagination import PageNumberPagination
-from .forms import PostForm, AttachmentForm
+from .forms import PostForm, AttachmentForm,PostReportForm
 from account.models import User, FriendRequest
 from account.serializers import UserSerializer
 
@@ -16,7 +16,7 @@ class PostPagination(PageNumberPagination):
 def post_list(request):
     usr_id_list = [request.user.id] + [user.id for user in request.user.friends.all()]
     posts = Post.objects.filter(created_by_id__in=usr_id_list)
-
+    
     paginator = PostPagination()
     paginated_posts = paginator.paginate_queryset(posts, request)
     serializer = PostSerializer(paginated_posts, many=True)
@@ -60,6 +60,7 @@ def add_post(request):
         request.user.save()
 
         serializer = PostSerializer(post)
+        
         return JsonResponse(serializer.data, safe=False)
     else:
         errors = {**post_form.errors, **attachment_form.errors}
@@ -107,3 +108,12 @@ def add_comment(request, pk):
 def get_trends(request):
     serializer = TrendSerializer(Trend.objects.all(), many=True)
     return JsonResponse(serializer.data, safe=False)
+
+
+@api_view(['POST'])
+def report_post(request):
+    serializer = PostReportSerializer(data=request.data)
+    if serializer.is_valid():
+        serializer.save(person_reporting=request.user)
+        return JsonResponse({'success': True, 'message': 'Report submitted successfully.'}, status=201)
+    return JsonResponse({'success': False, 'errors': serializer.errors}, status=400)

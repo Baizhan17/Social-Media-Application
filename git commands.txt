@@ -1,6 +1,0 @@
-C:\Users\user\OneDrive\Рабочий стол\diploma2.0>git commit -m "The commit for the social media app"
-
-C:\Users\user\OneDrive\Рабочий стол\diploma2.0>git remote add origin https://w66257@dev.azure.com/w66257/Social%20Media%20Application/_git/Social%20Media
-
-C:\Users\user\OneDrive\Рабочий стол\diploma2.0>git branch -M master
-C:\Users\user\OneDrive\Рабочий стол\diploma2.0>git push -u origin master

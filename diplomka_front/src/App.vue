@@ -1,5 +1,5 @@
 <template>
-    <nav class="py-10 px-8 border-b border-gray-200 bg-indigo-400">
+    <nav class="py-10 px-8 border-b border-gray-200 bg-gradient-to-r from-indigo-500 from-10% via-sky-500 via-30% to-emerald-500 to-90%">
         <div class="max-w-7xl mx-auto">
             <div class="flex items-center justify-between">
                 <div class="menu-left">
@@ -36,7 +36,7 @@
                 <div class="menu-right">
                     <template v-if="userStore.user.isAuthenticated">
                         <RouterLink :to="{name:'profile',params:{'id':userStore.user.id}}">
-                            <img src="https://i.pravatar.cc/150?u=fake@pravatar.com" class="rounded-full">
+                            <img src="https://placebear.com/250/250" class="rounded-full w-32 h-32 ">
                         </RouterLink>
                     </template>
 

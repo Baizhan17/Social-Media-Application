@@ -4,7 +4,7 @@
             <div class="bg-white border border-gray-200 rounded-lg">
                 <form v-on:submit.prevent="submitForm" class="p-4 flex flex-col space-y-2">  
                     <div class="flex space-x-4">
-                        <input v-model="query" type="search" class="p-4 w-full bg-gray-100 rounded-lg" placeholder="What are you looking for?" v-if="!user">
+                        <input v-model="query" type="search" class="p-4 w-full bg-gray-100 rounded-lg" placeholder="What are you looking for?" >
                         
                         <button class="inline-block py-4 px-6 bg-blue-600 text-white rounded-lg">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6" required>
@@ -21,7 +21,7 @@
                 v-if="users.length"
             >
                 <div 
-                    class="p-4 text-center bg-gray-100 rounded-lg"
+                    class="p-4 text-center bg-gray-100 rounded-lg conversation-item"
                     v-for="user in users"
                     v-bind:key="user.id"
                 >
@@ -101,6 +101,9 @@ export default {
 
                     this.users = response.data.users
                     this.posts = response.data.posts
+                    if(this.users.length ==0&&this.posts.length ==0) {
+                        console.log('Nothing found here')
+                    }
                 })
                 .catch(error => {
                     console.log('error:', error)
@@ -109,3 +112,12 @@ export default {
     }
 }
 </script>
+<style scoped>
+.conversation-item {
+    transition: filter 0.3s ease-in-out;
+  }
+  
+  .conversation-item:hover {
+    filter: blur(2px);
+  }
+</style>

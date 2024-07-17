@@ -26,7 +26,7 @@ class ConvMessageSerializer(serializers.ModelSerializer):
 class ConversationDetailSerializer(serializers.ModelSerializer):
     messages = ConvMessageSerializer(read_only=True,many=True)
    # created_by = UserSerializer(read_only=True)
-    users = UserSerializer(read_only=True, many=True)
+    #users = UserSerializer(read_only=True, many=True)
     class Meta:
         model = Conversation
         fields = ('id','users','modified_at_format','messages')
